@@ -9,11 +9,17 @@
 import UIKit
 
 
-open class ATSelectOptionController: UIAlertController {
+open class ATSelectOptionController: UIViewController {
+    private var containerView: UIView!
+    private var contentStackView: UIStackView!
+    
     private var optionTableView: UITableView!
     private var options: Array<Option>?
     
     private var datePicker: UIDatePicker!
+    
+    private var cancelButton: UIButton!
+    private var doneButton: UIButton!
     
     private var completion :((Option?) -> ())?
     private var dateCompletion :((Date?) -> ())?
@@ -27,10 +33,8 @@ open class ATSelectOptionController: UIAlertController {
         case dateTime
     }
     
-    
-    public override var preferredStyle: UIAlertController.Style {
-        return .actionSheet
-    }
+    private let sectionBackgroundColor = UIColor(red: 250.0/255.0, green: 250.0/255.0, blue: 250.0/255.0, alpha: 1.0)
+    private let sectionCornerRadius :CGFloat = 10.0
     
     
     public init() {
@@ -55,67 +59,137 @@ open class ATSelectOptionController: UIAlertController {
     private func setup() {
         self.title = "Please Select"
         
-        let aMargin:CGFloat = 10.0
-        let aRect = CGRect(x: aMargin, y: aMargin + 26.0, width: self.view.bounds.size.width - (aMargin * 4.0), height: 220.0)
+        self.view.backgroundColor = UIColor.clear
+        
+        // Setup container view
+        self.containerView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0))
+        self.containerView.backgroundColor = UIColor.clear
+        self.containerView.layer.masksToBounds = false
+        self.containerView.layer.cornerRadius = self.sectionCornerRadius
+        self.containerView.layer.shadowColor = UIColor.black.cgColor
+        self.containerView.layer.shadowOpacity = 0.2
+        self.containerView.layer.shadowRadius = 16.0
+        self.containerView.layer.shadowOffset = CGSize.zero
+        self.view.addSubview(self.containerView)
+        
+        self.containerView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-8-[containerView]-8-|", options: [], metrics: nil, views: ["containerView" : self.containerView!]))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:[containerView]-8-|", options: [], metrics: nil, views: ["containerView" : self.containerView!]))
+        
+        
+        // Setup content view
+        self.contentStackView = UIStackView(frame: CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0))
+        self.contentStackView.backgroundColor = UIColor.clear
+        self.contentStackView.axis = .vertical
+        self.contentStackView.distribution = .equalSpacing
+        self.contentStackView.spacing = 8.0
+        self.containerView.addSubview(self.contentStackView)
+        
+        self.contentStackView.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-0-[contentStackView]-0-|", options: [], metrics: nil, views: ["contentStackView" : self.contentStackView!]))
+        self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-0-[contentStackView]-0-|", options: [], metrics: nil, views: ["contentStackView" : self.contentStackView!]))
+        
+        
+        // Setup option table view
+        self.optionTableView = UITableView(frame: CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0))
+        self.optionTableView.backgroundColor = self.sectionBackgroundColor
+        self.optionTableView.layer.cornerRadius = self.sectionCornerRadius
+        self.optionTableView.layer.masksToBounds = true
+        self.optionTableView.separatorInset = UIEdgeInsets.zero
+        self.optionTableView.dataSource = self
+        self.optionTableView.delegate = self
+        self.optionTableView.tableFooterView = UIView()
+        self.contentStackView.addArrangedSubview(self.optionTableView)
+        self.optionTableView.reloadData()
+        
+        self.optionTableView.translatesAutoresizingMaskIntoConstraints = false
+        self.optionTableView.addConstraint(NSLayoutConstraint(item: self.optionTableView!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 200.0))
+        
+        
+        // Setup date picker view
+        self.datePicker = UIDatePicker(frame: CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0))
+        self.datePicker.backgroundColor = self.sectionBackgroundColor
+        self.datePicker.layer.cornerRadius = self.sectionCornerRadius
+        self.datePicker.layer.masksToBounds = true
+        if #available(iOS 13.4, *) {
+            self.datePicker.preferredDatePickerStyle = .wheels
+        }
+        switch self.type {
+        case .singleSelect:
+            break
+        case .date:
+            self.datePicker.datePickerMode = .date
+        case .time:
+            self.datePicker.datePickerMode = .time
+        case .dateTime:
+            self.datePicker.datePickerMode = .dateAndTime
+        }
+        self.contentStackView.addArrangedSubview(self.datePicker)
+        
+        self.datePicker.translatesAutoresizingMaskIntoConstraints = false
+        self.datePicker.addConstraint(NSLayoutConstraint(item: self.datePicker!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 200.0))
+        
+        
+        // Setup done button
+        self.doneButton = UIButton(type: .system)
+        self.doneButton.setTitle("DONE", for: .normal)
+        self.doneButton.titleLabel?.font = UIFont.systemFont(ofSize: 17.0)
+        self.doneButton.backgroundColor = self.sectionBackgroundColor
+        self.doneButton.layer.cornerRadius = self.sectionCornerRadius
+        self.doneButton.layer.masksToBounds = true
+        self.doneButton.addTarget(self, action: #selector(self.didSelectDone), for: .touchUpInside)
+        self.contentStackView.addArrangedSubview(self.doneButton)
+        
+        self.doneButton.translatesAutoresizingMaskIntoConstraints = false
+        self.doneButton.addConstraint(NSLayoutConstraint(item: self.doneButton!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 50.0))
+        
+        
+        // Setup cancel button
+        self.cancelButton = UIButton(type: .system)
+        self.cancelButton.setTitle("CANCEL", for: .normal)
+        self.cancelButton.titleLabel?.font = UIFont.systemFont(ofSize: 17.0)
+        self.cancelButton.tintColor = UIColor.darkGray
+        self.cancelButton.backgroundColor = self.sectionBackgroundColor
+        self.cancelButton.layer.cornerRadius = self.sectionCornerRadius
+        self.cancelButton.layer.masksToBounds = true
+        self.cancelButton.addTarget(self, action: #selector(self.didSelectCancel), for: .touchUpInside)
+        self.contentStackView.addArrangedSubview(self.cancelButton)
+        
+        self.cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        self.cancelButton.addConstraint(NSLayoutConstraint(item: self.cancelButton!, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1.0, constant: 50.0))
+        
         
         switch self.type {
         case .singleSelect:
-            self.optionTableView = UITableView(frame: aRect)
-            self.optionTableView.backgroundColor = UIColor.clear
-            self.optionTableView.separatorInset = UIEdgeInsets.zero
-            self.optionTableView.dataSource = self
-            self.optionTableView.delegate = self
-            self.optionTableView.tableFooterView = UIView()
-            self.view.addSubview(self.optionTableView)
-            
-            self.optionTableView.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-[optionTableView]-|", options: [], metrics: nil, views: ["optionTableView" : self.optionTableView]))
-            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-26-[optionTableView(==180)]-124-|", options: [], metrics: nil, views: ["optionTableView" : self.optionTableView]))
-            
-            self.optionTableView.reloadData()
+            self.datePicker.isHidden = true
+            self.optionTableView.isHidden = false
+            self.doneButton.isHidden = true
+            self.doneButton.isHidden = false
         case .dateTime, .time, .date:
-            self.datePicker = UIDatePicker(frame: aRect)
-            self.datePicker.backgroundColor = UIColor.clear
-            if #available(iOS 13.4, *) {
-                self.datePicker.preferredDatePickerStyle = .wheels
-            }
-            switch self.type {
-            case .singleSelect:
-                break
-            case .date:
-                self.datePicker.datePickerMode = .date
-            case .time:
-                self.datePicker.datePickerMode = .time
-            case .dateTime:
-                self.datePicker.datePickerMode = .dateAndTime
-            }
-            self.view.addSubview(self.datePicker)
-            
-            self.datePicker.translatesAutoresizingMaskIntoConstraints = false
-            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "H:|-[datePicker]-|", options: [], metrics: nil, views: ["datePicker" : self.datePicker]))
-            self.view.addConstraints(NSLayoutConstraint.constraints(withVisualFormat: "V:|-26-[datePicker(==180)]-124-|", options: [], metrics: nil, views: ["datePicker" : self.datePicker]))
-            
-            self.addAction(UIAlertAction(title: "Done", style: .default, handler: {_ in
-                self.didSelectDone()
-            }))
+            self.datePicker.isHidden = false
+            self.optionTableView.isHidden = true
+            self.doneButton.isHidden = false
+            self.doneButton.isHidden = false
         }
-        
-        self.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: {_ in
-            self.didSelectCancel()
-        }))
     }
     
     
     public func show(presenter pController: UIViewController, options pOptionArray :Array<Option>, callback pCallback: @escaping ((Option?) -> ())) {
         self.options = pOptionArray
         self.completion = pCallback
-        
-        pController.present(self, animated: true, completion: nil)
+        self.present(presenter: pController)
     }
     
     
     public func show(presenter pController: UIViewController, callback pCallback: @escaping ((Date?) -> ())) {
         self.dateCompletion = pCallback
+        self.present(presenter: pController)
+    }
+    
+    
+    private func present(presenter pController: UIViewController) {
+        pController.definesPresentationContext = true
+        self.modalPresentationStyle = .overCurrentContext
         pController.present(self, animated: true, completion: nil)
     }
     
@@ -140,12 +214,12 @@ extension ATSelectOptionController {
         self.dismiss(animated: true, completion: nil)
     }
 
-    func didSelectCancel() {
+    @objc func didSelectCancel() {
         self.completion?(nil)
         self.dismiss(animated: true, completion: nil)
     }
     
-    func didSelectDone() {
+    @objc func didSelectDone() {
         switch self.type {
         case .singleSelect:
             self.completion?(nil)
