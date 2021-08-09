@@ -109,6 +109,7 @@ open class ATSelectOptionController: UIViewController {
         // Setup date picker view
         self.datePicker = UIDatePicker(frame: CGRect(x: 0.0, y: 0.0, width: 10.0, height: 10.0))
         self.datePicker.backgroundColor = self.sectionBackgroundColor
+        self.datePicker.layer.backgroundColor = self.sectionBackgroundColor.cgColor
         self.datePicker.layer.cornerRadius = self.sectionCornerRadius
         self.datePicker.layer.masksToBounds = true
         if #available(iOS 13.4, *) {
@@ -164,12 +165,12 @@ open class ATSelectOptionController: UIViewController {
             self.datePicker.isHidden = true
             self.optionTableView.isHidden = false
             self.doneButton.isHidden = true
-            self.doneButton.isHidden = false
+            self.cancelButton.isHidden = false
         case .dateTime, .time, .date:
             self.datePicker.isHidden = false
             self.optionTableView.isHidden = true
             self.doneButton.isHidden = false
-            self.doneButton.isHidden = false
+            self.cancelButton.isHidden = false
         }
     }
     
