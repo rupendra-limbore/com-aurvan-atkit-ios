@@ -267,12 +267,22 @@ extension ATWindow {
 
 // MARK:- Dismiss Keyboard
 
-extension ATWindow {
+extension ATWindow :UIGestureRecognizerDelegate {
     
     private func initializeForDismissKeyboard() {
         let aTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ATWindow.didTapWindow(_:)))
         aTapGestureRecognizer.cancelsTouchesInView = false
+        aTapGestureRecognizer.delegate = self
         self.addGestureRecognizer(aTapGestureRecognizer)
+    }
+    
+    
+    public func gestureRecognizer(_ pGestureRecognizer: UIGestureRecognizer, shouldReceive pTouch: UITouch) -> Bool {
+        var aReturnVal = true
+        if pTouch.view?.isKind(of: UIControl.self) == true {
+            aReturnVal = false
+        }
+        return aReturnVal
     }
     
     
