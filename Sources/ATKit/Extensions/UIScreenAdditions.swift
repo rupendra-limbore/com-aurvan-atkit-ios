@@ -21,7 +21,7 @@ public extension UIScreen {
     }
     
     var screenSizeType :ScreenSizeType {
-        var aReturnVal = ScreenSizeType.medium
+        var aReturnVal = ScreenSizeType.iPhoneMedium
         
         let aPpi = UIScreen.main.scale * (UIDevice.current.userInterfaceIdiom == .pad ? 132 : 163)
         let aScreenWidth = UIScreen.main.bounds.size.width * UIScreen.main.scale
