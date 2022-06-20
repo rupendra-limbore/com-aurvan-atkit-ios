@@ -260,4 +260,107 @@ public extension UIDevice {
         return aReturnVal
     }
     
+    
+    enum DeviceSizeType {
+        case iPhone1To4S // 3.5"
+        case iPhone5Series // 4"
+        case iPhone6To8AndSE // 4.7", 4" (SE1)
+        case iPhone6PlusTo8Plus // 5.5"
+        case iPhoneFullScreenSeries
+        case iPhoneFullScreenMaxSeries
+        case iPhoneFullScreenMiniSeries
+        case iPadSeries
+        case iPadMiniSeries
+        case unknown
+    }
+    
+    var deviceSizeType :DeviceSizeType {
+        var aReturnVal = DeviceSizeType.unknown
+        
+        switch self.deviceModel {
+        case .iPodTouch5thGeneration
+            , .iPodTouch6thGeneration
+            , .iPodTouch7thGeneration:
+            aReturnVal = .iPhone1To4S
+        case .iPhone4
+            , .iPhone4s:
+            aReturnVal = .iPhone1To4S
+        case .iPhone5
+            , .iPhone5c
+            ,.iPhone5s:
+            aReturnVal = .iPhone5Series
+        case .iPhone6
+            , .iPhone6s
+            , .iPhone7
+            , .iPhone8:
+            aReturnVal = .iPhone6To8AndSE
+        case .iPhone6Plus
+            , .iPhone6sPlus
+            , .iPhone7Plus
+            , .iPhone8Plus
+            , .iPhoneSE
+            , .iPhoneSE2ndGeneration
+            , .iPhoneSE3rdGeneration:
+            aReturnVal = .iPhone6PlusTo8Plus
+        case .iPhoneX
+            , .iPhoneXS
+            , .iPhoneXR
+            , .iPhone11
+            , .iPhone11Pro
+            , .iPhone12
+            , .iPhone12Pro
+            , .iPhone13
+            , .iPhone13Pro:
+            aReturnVal = .iPhoneFullScreenSeries
+        case .iPhoneXSMax
+            , .iPhone11ProMax
+            , .iPhone12ProMax
+            , .iPhone13ProMax:
+            aReturnVal = .iPhoneFullScreenMaxSeries
+        case .iPhone12Mini
+            , .iPhone13Mini:
+            aReturnVal = .iPhoneFullScreenMiniSeries
+        case .iPad2
+            , .iPad3rdGeneration
+            , .iPad4thGeneration
+            , .iPad5thGeneration
+            , .iPad6thGeneration
+            , .iPad7thGeneration
+            , .iPad8thGeneration
+            , .iPad9thGeneration
+            , .iPadAir
+            , .iPadAir2
+            , .iPadAir3rdGeneration
+            , .iPadAir4thGeneration
+            , .iPadAir5thGeneration:
+            aReturnVal = .iPadSeries
+        case .iPadMini
+            , .iPadMini2
+            , .iPadMini3
+            , .iPadMini4
+            , .iPadMini5thGeneration
+            , .iPadMini6thGeneration
+            , .iPadPro9_7Inch
+            , .iPadPro10_5Inch
+            , .iPadPro11Inch1stGeneration
+            , .iPadPro11Inch2ndGeneration
+            , .iPadPro11Inch3rdGeneration:
+            aReturnVal = .iPadMiniSeries
+        case .iPadPro12_9Inch1stGeneration
+            , .iPadPro12_9Inch2ndGeneration
+            , .iPadPro12_9Inch3rdGeneration
+            , .iPadPro12_9Inch4thGeneration
+            , .iPadPro12_9Inch5thGeneration:
+            aReturnVal = .iPadMiniSeries
+        case .appleTV
+            , .appleTV4K
+            , .homePod
+            , .homePodMini
+            , .unknown:
+            aReturnVal = .unknown
+        }
+        
+        return aReturnVal
+    }
+    
 }
