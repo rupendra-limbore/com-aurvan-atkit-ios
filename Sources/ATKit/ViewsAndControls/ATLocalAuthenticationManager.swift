@@ -27,35 +27,6 @@ public class ATLocalAuthenticationManager: NSObject {
     private let proceedButtonTitle = "PROCEED"
     
     
-    private var topWindow: UIWindow? {
-        // Take top-most window, as this will hide the keyboard and other windows as well.
-        var aReturnVal :UIWindow?
-        if let aWindow = UIApplication.shared.keyWindow {
-            aReturnVal = aWindow
-        } else {
-            aReturnVal = UIApplication.shared.windows.last
-        }
-        return aReturnVal
-    }
-    
-    
-    private func topViewController(controller pController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController) -> UIViewController? {
-        var aReturnVal :UIViewController?
-        
-        if let aNavigationController = pController as? UINavigationController {
-            aReturnVal = self.topViewController(controller: aNavigationController.visibleViewController)
-        } else if let aTabController = pController as? UITabBarController, let aSelectedViewController = aTabController.selectedViewController {
-            aReturnVal = self.topViewController(controller: aSelectedViewController)
-        } else if let aPresentedViewController = pController?.presentedViewController {
-            aReturnVal = self.topViewController(controller: aPresentedViewController)
-        } else {
-            aReturnVal = pController
-        }
-        
-        return aReturnVal
-    }
-    
-    
     private func displayOverlay() {
         if self.overlayView != nil {
             self.overlayView.removeFromSuperview()
@@ -63,10 +34,10 @@ public class ATLocalAuthenticationManager: NSObject {
         }
         self.overlayView = UIVisualEffectView(effect: UIBlurEffect(style: UIBlurEffect.Style.dark))
         
-        self.topWindow?.addSubview(self.overlayView)
-        self.topWindow?.bringSubviewToFront(self.overlayView)
+        ATUtilityManager.topWindow?.addSubview(self.overlayView)
+        ATUtilityManager.topWindow?.bringSubviewToFront(self.overlayView)
         
-        self.overlayView.frame = self.topWindow?.bounds ?? UIScreen.main.bounds
+        self.overlayView.frame = ATUtilityManager.topWindow?.bounds ?? UIScreen.main.bounds
         
         let aLabel = UILabel()
         aLabel.frame = CGRect(x: 0.0, y: 0.0, width: 20.0, height: 20.0)
@@ -171,11 +142,11 @@ public class ATLocalAuthenticationManager: NSObject {
                     self?.hideOverlay()
                 } else {
                     self?.displayOverlay()
-                    self?.topViewController()?.present(anAlertController, animated: true)
+                    ATUtilityManager.topViewController()?.present(anAlertController, animated: true)
                 }
             }
         }))
-        self.topViewController()?.present(anAlertController, animated: true)
+        ATUtilityManager.topViewController()?.present(anAlertController, animated: true)
         self.passwordAlertController = anAlertController
     }
 }
