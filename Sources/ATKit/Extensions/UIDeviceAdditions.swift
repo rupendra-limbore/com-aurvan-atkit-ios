@@ -59,6 +59,10 @@ public extension UIDevice {
         case iPhone13
         case iPhone13Pro
         case iPhone13ProMax
+        case iPhone14
+        case iPhone14Plus
+        case iPhone14Pro
+        case iPhone14ProMax
         case iPhoneSE
         case iPhoneSE2ndGeneration
         case iPhoneSE3rdGeneration
@@ -181,6 +185,14 @@ public extension UIDevice {
             aReturnVal = .iPhone13Pro
         case "iPhone14,3":
             aReturnVal = .iPhone13ProMax
+        case "iPhone14,7":
+            aReturnVal = .iPhone14
+        case "iPhone14,8":
+            aReturnVal = .iPhone14Plus
+        case "iPhone15,2":
+            aReturnVal = .iPhone14Pro
+        case "iPhone15,3":
+            aReturnVal = .iPhone14ProMax
         case "iPhone8,4":
             aReturnVal = .iPhoneSE
         case "iPhone12,8":
@@ -310,12 +322,16 @@ public extension UIDevice {
             , .iPhone12
             , .iPhone12Pro
             , .iPhone13
-            , .iPhone13Pro:
+            , .iPhone13Pro
+            , .iPhone14
+            , .iPhone14Pro:
             aReturnVal = .iPhoneFullScreenSeries
         case .iPhoneXSMax
             , .iPhone11ProMax
             , .iPhone12ProMax
-            , .iPhone13ProMax:
+            , .iPhone13ProMax
+            , .iPhone14Plus
+            , .iPhone14ProMax:
             aReturnVal = .iPhoneFullScreenMaxSeries
         case .iPhone12Mini
             , .iPhone13Mini:
