@@ -74,6 +74,7 @@ public extension UIDevice {
         case iPad7thGeneration
         case iPad8thGeneration
         case iPad9thGeneration
+        case iPad10thGeneration
         case iPadAir
         case iPadAir2
         case iPadAir3rdGeneration
@@ -90,11 +91,13 @@ public extension UIDevice {
         case iPadPro11Inch1stGeneration
         case iPadPro11Inch2ndGeneration
         case iPadPro11Inch3rdGeneration
+        case iPadPro11Inch4thGeneration
         case iPadPro12_9Inch1stGeneration
         case iPadPro12_9Inch2ndGeneration
         case iPadPro12_9Inch3rdGeneration
         case iPadPro12_9Inch4thGeneration
         case iPadPro12_9Inch5thGeneration
+        case iPadPro12_9Inch6thGeneration
         case appleTV
         case appleTV4K
         case homePod
@@ -215,6 +218,8 @@ public extension UIDevice {
             aReturnVal = .iPad8thGeneration
         case "iPad12,1", "iPad12,2":
             aReturnVal = .iPad9thGeneration
+        case "iPad13,18", "iPad13,19":
+            aReturnVal = .iPad10thGeneration
         case "iPad4,1", "iPad4,2", "iPad4,3":
             aReturnVal = .iPadAir
         case "iPad5,3", "iPad5,4":
@@ -247,6 +252,8 @@ public extension UIDevice {
             aReturnVal = .iPadPro11Inch2ndGeneration
         case "iPad13,4", "iPad13,5", "iPad13,6", "iPad13,7":
             aReturnVal = .iPadPro11Inch3rdGeneration
+        case "iPad14,3-A", "iPad14,3-B", "iPad14,4-A", "iPad14,4-B":
+            aReturnVal = .iPadPro11Inch4thGeneration
         case "iPad6,7", "iPad6,8":
             aReturnVal = .iPadPro12_9Inch1stGeneration
         case "iPad7,1", "iPad7,2":
@@ -257,6 +264,8 @@ public extension UIDevice {
             aReturnVal = .iPadPro12_9Inch4thGeneration
         case "iPad13,8", "iPad13,9", "iPad13,10", "iPad13,11":
             aReturnVal = .iPadPro12_9Inch5thGeneration
+        case "iPad14,5-A", "iPad14,5-B", "iPad14,6-A", "iPad14,6-B":
+            aReturnVal = .iPadPro12_9Inch6thGeneration
         case "AppleTV5,3":
             aReturnVal = .appleTV
         case "AppleTV6,2":
@@ -344,6 +353,7 @@ public extension UIDevice {
             , .iPad7thGeneration
             , .iPad8thGeneration
             , .iPad9thGeneration
+            , .iPad10thGeneration
             , .iPadAir
             , .iPadAir2
             , .iPadAir3rdGeneration
@@ -360,13 +370,15 @@ public extension UIDevice {
             , .iPadPro10_5Inch
             , .iPadPro11Inch1stGeneration
             , .iPadPro11Inch2ndGeneration
-            , .iPadPro11Inch3rdGeneration:
+            , .iPadPro11Inch3rdGeneration
+            , .iPadPro11Inch4thGeneration:
             aReturnVal = .iPadMiniSeries
         case .iPadPro12_9Inch1stGeneration
             , .iPadPro12_9Inch2ndGeneration
             , .iPadPro12_9Inch3rdGeneration
             , .iPadPro12_9Inch4thGeneration
-            , .iPadPro12_9Inch5thGeneration:
+            , .iPadPro12_9Inch5thGeneration
+            , .iPadPro12_9Inch6thGeneration:
             aReturnVal = .iPadMiniSeries
         case .appleTV
             , .appleTV4K
