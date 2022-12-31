@@ -27,6 +27,26 @@ public extension UIDevice {
         return aReturnVal
     }
     
+    var isIphone :Bool {
+        var aReturnVal :Bool = false
+        
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            aReturnVal = true
+        }
+        
+        return aReturnVal
+    }
+    
+    var isIpad :Bool {
+        var aReturnVal :Bool = false
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            aReturnVal = true
+        }
+        
+        return aReturnVal
+    }
+    
     enum DeviceModel {
         case iPodTouch5thGeneration
         case iPodTouch6thGeneration
