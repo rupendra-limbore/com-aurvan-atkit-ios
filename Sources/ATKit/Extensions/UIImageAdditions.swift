@@ -50,4 +50,52 @@ public extension UIImage {
         return aReturnVal
     }
     
+    
+    /**
+     The function to resize / rescale the UIImage.
+     
+     **Usage Example**
+     ```swift
+     let anImage :UIImage = UIImage(named: "DefaultAvatar")!
+     let aResizedImage :UIImage? = anImage.resize(size: CGSize(width: 100.0, height: 200.0), scaleMode: UIImageScaleMode.aspectFit)
+     ```
+     */
+    func resize(size pSize:CGSize, scaleMode pScaleMode: UIImageScaleMode) -> UIImage? {
+        var aReturnVal :UIImage? = nil
+        
+        var aNewWidth = pSize.width
+        var aNewHeight = pSize.height
+        switch pScaleMode {
+        case .aspectFit:
+            if pSize.width / self.size.width > pSize.height / self.size.height {
+                aNewWidth = pSize.width
+                let aScale = pSize.width / self.size.width
+                aNewHeight = self.size.height * aScale
+            } else {
+                aNewHeight = pSize.height
+                let aScale = pSize.height / self.size.height
+                aNewWidth = self.size.width * aScale
+            }
+        case .aspectFill:
+            aNewWidth = pSize.width
+            aNewHeight = pSize.height
+        case .resize:
+            aNewWidth = pSize.width
+            aNewHeight = pSize.height
+        }
+        
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: aNewWidth, height: aNewHeight), false, 1.0)
+        self.draw(in: CGRect(x: 0.0, y: 0.0, width: aNewWidth, height: aNewHeight))
+        aReturnVal = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return aReturnVal
+    }
+}
+
+
+public enum UIImageScaleMode: Int {
+    case aspectFit
+    case aspectFill
+    case resize
 }
