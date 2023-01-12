@@ -298,6 +298,12 @@ public extension ATHttpManager {
         var value :Data?
         var fileName :String?
         
+        public init(name pName :String, value pValue :Data?, fileName pFileName :String?) {
+            self.name = pName
+            self.value = pValue
+            self.fileName = pFileName
+        }
+        
         var mimeType :String {
             var aReturnVal = "application/octet-stream"
             if let anExtension = self.fileName?.components(separatedBy: ".").last {
