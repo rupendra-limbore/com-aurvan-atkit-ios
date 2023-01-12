@@ -52,4 +52,15 @@ public extension String {
         return aReturnVal
     }
     
+    subscript(_ pRange: CountableRange<Int>) -> String {
+        let aStart = index(startIndex, offsetBy: max(0, pRange.lowerBound))
+        let anEnd = index(aStart, offsetBy: min(self.count - pRange.lowerBound, pRange.upperBound - pRange.lowerBound))
+        return String(self[aStart..<anEnd])
+    }
+
+    subscript(_ pRange: CountablePartialRangeFrom<Int>) -> String {
+        let aStart = index(startIndex, offsetBy: max(0, pRange.lowerBound))
+        return String(self[aStart...])
+    }
+    
 }

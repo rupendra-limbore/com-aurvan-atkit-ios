@@ -239,20 +239,11 @@ public extension ATHttpManager {
                     aReturnVal = aBody
                 }
             case .multipart(let pParameterArray):
-                var aBody = ""
+                var aStringArray: Array<String> = Array<String>()
                 for aParameter in pParameterArray {
-                    var aSize = "0 kb"
-                    if let aCount = aParameter.value?.count {
-                        if aCount <= 1024 {
-                            aSize = String(format: "%d bytes", aCount)
-                        } else if aCount > 1024 && aCount <= (1024 * 1024) {
-                            aSize = String(format: "%d kb", aCount / 1024)
-                        } else {
-                            aSize = String(format: "%d mb", aCount / (1024 * 1024))
-                        }
-                    }
-                    aBody += String(format: "\n%@%@ = %@", aParameter.name ?? "", (aParameter.fileName != nil ? (" (" + aParameter.fileName! + ")") : ""), aSize)
+                    aStringArray.append(aParameter.description)
                 }
+                aReturnVal = aStringArray.joined(separator: "\n")
             }
             return aReturnVal
         }
@@ -327,17 +318,24 @@ public extension ATHttpManager {
         
         var description: String {
             var aReturnVal = ""
-            var aSize = "0 kb"
-            if let aCount = self.value?.count {
-                if aCount <= 1024 {
-                    aSize = String(format: "%d bytes", aCount)
-                } else if aCount > 1024 && aCount <= (1024 * 1024) {
-                    aSize = String(format: "%d kb", aCount / 1024)
-                } else {
-                    aSize = String(format: "%d mb", aCount / (1024 * 1024))
+            var aValue = ""
+            if let aData = self.value
+            , let aString = String(data: aData, encoding: .utf8) {
+                aValue = aString[0..<10]
+            } else {
+                var aSize = "0 kb"
+                if let aCount = self.value?.count {
+                    if aCount <= 1024 {
+                        aSize = String(format: "%d bytes", aCount)
+                    } else if aCount > 1024 && aCount <= (1024 * 1024) {
+                        aSize = String(format: "%d kb", aCount / 1024)
+                    } else {
+                        aSize = String(format: "%d mb", aCount / (1024 * 1024))
+                    }
                 }
+                aValue = String(format: "<%@(%@)>", (self.fileName != nil ? (self.fileName! + " ") : ""), aSize)
             }
-            aReturnVal = String(format: "\n%@%@ = %@", self.name ?? "", (self.fileName != nil ? (" (" + self.fileName! + ")") : ""), aSize)
+            aReturnVal = String(format: "%@ = %@", self.name ?? "", aValue)
             return aReturnVal
         }
     }
