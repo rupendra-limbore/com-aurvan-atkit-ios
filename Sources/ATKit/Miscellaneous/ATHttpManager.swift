@@ -15,6 +15,8 @@ public class ATHttpManager {
     
     public var isDebug: Bool = false
     
+    private let defaultMultipartEndOfPart :String = "--"
+    
     public init() {
         
     }
@@ -58,9 +60,29 @@ public class ATHttpManager {
             case .data(let pData):
                 aUrlRequest.httpBody = pData
             case .json(let pDict):
+                aUrlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
                 aUrlRequest.httpBody = try? JSONSerialization.data(withJSONObject: pDict, options: .prettyPrinted)
-            case .multipart(_):
-                break
+            case .multipart(let pParameterArray, let pEndOfPartString):
+                let aBoundary = UUID().uuidString.replacingOccurrences(of: "-", with: "")
+                aUrlRequest.addValue(String(format: "multipart/form-data; boundary=%@", aBoundary), forHTTPHeaderField: "Content-Type")
+                var aBodyData = Data()
+                for aParameter in pParameterArray {
+                    if let aParameterName = aParameter.name
+                    , let aParameterValue = aParameter.value {
+                        aBodyData.append(String(format: "\r\n--%@\r\n", aBoundary).data(using: String.Encoding.utf8)!)
+                        if let aParameterFileName = aParameter.fileName {
+                            aBodyData.append(String(format: "Content-Type: %@\r\n", aParameter.mimeType).data(using: String.Encoding.utf8)!)
+                            aBodyData.append(String(format: "Content-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\n", aParameterName, aParameterFileName).data(using: String.Encoding.utf8)!)
+                        } else {
+                            aBodyData.append(String(format: "Content-Disposition: form-data; name=\"%@\"\r\n", aParameterName).data(using: String.Encoding.utf8)!)
+                        }
+                        aBodyData.append(String(format: "Content-Length: %lu\r\n", aParameterValue.count).data(using: String.Encoding.utf8)!)
+                        aBodyData.append("\r\n".data(using: String.Encoding.utf8)!)
+                        aBodyData.append(aParameterValue)
+                        aBodyData.append(String(format: "\r\n--%@%@", aBoundary, pEndOfPartString).data(using: String.Encoding.utf8)!)
+                    }
+                    aUrlRequest.httpBody = aBodyData
+                }
             }
         }
         
@@ -181,6 +203,9 @@ public extension ATHttpManager {
     enum Method {
         case get
         case post
+        case put
+        case patch
+        case delete
         
         var toString: String {
             var aReturnVal: String
@@ -189,6 +214,12 @@ public extension ATHttpManager {
                 aReturnVal = "GET"
             case .post:
                 aReturnVal = "POST"
+            case .put:
+                aReturnVal = "PUT"
+            case .patch:
+                aReturnVal = "PATCH"
+            case .delete:
+                aReturnVal = "DELETE"
             }
             return aReturnVal
         }
@@ -222,7 +253,7 @@ public extension ATHttpManager {
         case empty
         case data(Data)
         case json(Dictionary<String,Any>)
-        case multipart(Array<Parameter>)
+        case multipart(Array<Parameter>, String = "--")
         
         var description: String {
             var aReturnVal: String = ""
@@ -238,7 +269,7 @@ public extension ATHttpManager {
                 , let aBody = String(data: aData, encoding: String.Encoding.utf8) {
                     aReturnVal = aBody
                 }
-            case .multipart(let pParameterArray):
+            case .multipart(let pParameterArray, _):
                 var aStringArray: Array<String> = Array<String>()
                 for aParameter in pParameterArray {
                     aStringArray.append(aParameter.description)
@@ -321,7 +352,7 @@ public extension ATHttpManager {
             var aValue = ""
             if let aData = self.value
             , let aString = String(data: aData, encoding: .utf8) {
-                aValue = aString[0..<10]
+                aValue = aString
             } else {
                 var aSize = "0 kb"
                 if let aCount = self.value?.count {
