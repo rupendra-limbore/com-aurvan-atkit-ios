@@ -60,7 +60,9 @@ public class ATHttpManager {
             case .data(let pData):
                 aUrlRequest.httpBody = pData
             case .json(let pDict):
-                aUrlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                if pHttpRequest.headers?.contains(where: { $0.name == "Content-Type" }) != true {
+                    aUrlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                }
                 aUrlRequest.httpBody = try? JSONSerialization.data(withJSONObject: pDict, options: .prettyPrinted)
             case .multipart(let pParameterArray, let pEndOfPartString):
                 let aBoundary = UUID().uuidString.replacingOccurrences(of: "-", with: "")
