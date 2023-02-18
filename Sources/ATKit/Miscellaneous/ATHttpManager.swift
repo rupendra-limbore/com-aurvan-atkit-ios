@@ -177,10 +177,10 @@ public class ATHttpManager {
     private func log(httpRequest pHttpRequest :HttpRequest) {
         if self.isDebug {
             var aLog :String = String(format: "\n----- BEGIN \"%@\"", pHttpRequest.title ?? "<null>")
-            aLog += String(format: "\n\nRequest URL:\n%@", pHttpRequest.url?.absoluteString ?? "<null>")
-            aLog += String(format: "\n\nRequest Method:\n%@", pHttpRequest.method?.toString ?? "<null>")
-            aLog += String(format: "\n\nRequest Headers:\n%@", pHttpRequest.headers?.description ?? "<null>")
-            aLog += String(format: "\n\nRequest Body:\n%@", pHttpRequest.body?.description ?? "<null>")
+            aLog += String(format: "\n\nRequest URL (%@):\n%@", pHttpRequest.title ?? "<null>", pHttpRequest.url?.absoluteString ?? "<null>")
+            aLog += String(format: "\n\nRequest Method (%@):\n%@", pHttpRequest.title ?? "<null>", pHttpRequest.method?.toString ?? "<null>")
+            aLog += String(format: "\n\nRequest Headers (%@):\n%@", pHttpRequest.title ?? "<null>", pHttpRequest.headers?.description ?? "<null>")
+            aLog += String(format: "\n\nRequest Body (%@):\n%@", pHttpRequest.title ?? "<null>", pHttpRequest.body?.description ?? "<null>")
             Swift.print(aLog)
         }
     }
@@ -188,10 +188,10 @@ public class ATHttpManager {
     
     private func log(httpResponse pHttpResponse :HttpResponse) {
         if self.isDebug {
-            var aLog :String = String(format: "\n\nResponse Error:\n%@", pHttpResponse.error?.localizedDescription ?? "<null>")
-            aLog += String(format: "\n\nResponse Code:\n%d", pHttpResponse.code ?? "<null>")
-            aLog += String(format: "\n\nResponse Headers:\n%@", pHttpResponse.headers?.description ?? "<null>")
-            aLog += String(format: "\n\nResponse Body:\n%@", pHttpResponse.body?.description ?? "<null>")
+            var aLog :String = String(format: "\n\nResponse Error (%@):\n%@", pHttpResponse.title ?? "<null>", pHttpResponse.error?.localizedDescription ?? "<null>")
+            aLog += String(format: "\n\nResponse Code (%@):\n%d", pHttpResponse.title ?? "<null>", pHttpResponse.code ?? "<null>")
+            aLog += String(format: "\n\nResponse Headers (%@):\n%@", pHttpResponse.title ?? "<null>", pHttpResponse.headers?.description ?? "<null>")
+            aLog += String(format: "\n\nResponse Body (%@):\n%@", pHttpResponse.title ?? "<null>", pHttpResponse.body?.description ?? "<null>")
             aLog += String(format: "\n\n----- END \"%@\"", pHttpResponse.title ?? "<null>")
             Swift.print(aLog)
         }
