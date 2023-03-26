@@ -95,6 +95,13 @@ import UIKit
     }
     
     
+    public override var text: String! {
+        didSet {
+            self.updatePlaceholder()
+        }
+    }
+    
+    
     @objc internal func textViewTextDidChange(_ pNotification: Notification) {
         if pNotification.object != nil && (pNotification.object! as AnyObject).isEqual(self) {
             self.updatePlaceholder()
