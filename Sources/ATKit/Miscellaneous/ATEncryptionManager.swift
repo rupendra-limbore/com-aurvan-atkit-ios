@@ -159,6 +159,92 @@ public class ATEncryptionManager {
 }
 
 
+extension ATEncryptionManager {
+    
+    func encryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
+        var aReturnVal :String?
+        
+        aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, iv: pIv, operationType: kCCEncrypt)
+        
+        return aReturnVal
+    }
+    
+    
+    func decryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
+        var aReturnVal :String?
+        
+        aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, iv: pIv, operationType: kCCDecrypt)
+        
+        return aReturnVal
+    }
+    
+    
+    private func cryptAes(string pString: String, passKey pPassKey :String /* 16 bytes for AES128 */, iv pIv  :String /* 16 bytes for AES128 */, operationType pOperationType :Int) throws -> String? {
+        var aReturnVal :String?
+        
+        var anInputData :Data?
+        if pOperationType == kCCEncrypt {
+            anInputData = pString.data(using: String.Encoding.utf8)
+        } else {
+            anInputData = Data(base64Encoded: pString)
+        }
+        
+        if let aData = anInputData {
+            var anIvString = pIv
+            if anIvString.count < 16 {
+                anIvString = anIvString + String(repeating: "X", count: 16 - anIvString.count)
+            } else if anIvString.count > 16 {
+                anIvString = String(anIvString.prefix(16))
+            }
+            let anIvData: Data = anIvString.data(using: String.Encoding.utf8)!
+            
+            var aPassKeyString = pPassKey
+            if aPassKeyString.count < 16 {
+                aPassKeyString = aPassKeyString + String(repeating: "X", count: 16 - aPassKeyString.count)
+            } else if aPassKeyString.count > 16 {
+                aPassKeyString = String(aPassKeyString.prefix(16))
+            }
+            let aPassKeyData: Data = aPassKeyString.data(using: String.Encoding.utf8)!
+            let aPassKeyLength = aPassKeyData.count
+            
+            let anOperation = CCOperation(pOperationType)
+
+            let aCryptLength = aData.count + kCCBlockSizeAES128
+            var aCryptData = Data(count: aCryptLength)
+            
+            let aCryptOptions = CCOptions(kCCOptionPKCS7Padding)
+
+            var aByteLength = Int(0)
+            
+            let aResultStatus = aCryptData.withUnsafeMutableBytes { cryptBytes in
+                aData.withUnsafeBytes { dataBytes in
+                    anIvData.withUnsafeBytes { ivBytes in
+                        aPassKeyData.withUnsafeBytes { keyBytes in
+                        CCCrypt(anOperation, CCAlgorithm(kCCAlgorithmAES), aCryptOptions, keyBytes.baseAddress, aPassKeyLength, ivBytes.baseAddress, dataBytes.baseAddress, aData.count, cryptBytes.baseAddress, aCryptLength, &aByteLength)
+                        }
+                    }
+                }
+            }
+
+            if UInt32(aResultStatus) == UInt32(kCCSuccess) {
+                aCryptData.removeSubrange(aByteLength..<aCryptData.count)
+            } else {
+                throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : String(format: "Crypt operation failed. Status: %d", aResultStatus)])
+            }
+            
+            if pOperationType == kCCEncrypt {
+                aReturnVal = aCryptData.base64EncodedString()
+            } else {
+                aReturnVal = String(data: aCryptData, encoding: .utf8)
+            }
+        }
+        
+        return aReturnVal
+    }
+    
+}
+
+
 
 //
 //    Base32.swift
