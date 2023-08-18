@@ -161,7 +161,7 @@ public class ATEncryptionManager {
 
 extension ATEncryptionManager {
     
-    func encryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
+    public func encryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
         var aReturnVal :String?
         
         aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, iv: pIv, operationType: kCCEncrypt)
@@ -170,7 +170,7 @@ extension ATEncryptionManager {
     }
     
     
-    func decryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
+    public func decryptAes(string pString: String, passKey pPassKey :String, iv pIv :String = "ABCDEFGHIJKLMNOP") throws -> String? {
         var aReturnVal :String?
         
         aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, iv: pIv, operationType: kCCDecrypt)
