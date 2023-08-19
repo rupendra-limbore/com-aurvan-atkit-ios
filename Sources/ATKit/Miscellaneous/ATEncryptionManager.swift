@@ -245,27 +245,6 @@ extension ATEncryptionManager {
 }
 
 
-
-            if UInt32(aResultStatus) == UInt32(kCCSuccess) {
-                aCryptData.removeSubrange(aByteLength..<aCryptData.count)
-            } else {
-                throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : String(format: "Crypt operation failed. Status: %d", aResultStatus)])
-            }
-            
-            if pOperationType == kCCEncrypt {
-                aReturnVal = aCryptData.base64EncodedString()
-            } else {
-                aReturnVal = String(data: aCryptData, encoding: .utf8)
-            }
-        }
-        
-        return aReturnVal
-    }
-    
-}
-
-
-
 //
 //    Base32.swift
 //
