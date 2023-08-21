@@ -114,6 +114,27 @@ public class ATEncryptionManager {
     }
     
     
+    public func md5(string pString: String) -> String {
+        var aReturnVal: String
+        
+        let aMessageData = pString.data(using:.utf8)!
+        var aDigestData = Data(count: Int(CC_MD5_DIGEST_LENGTH))
+        _ = aDigestData.withUnsafeMutableBytes { pDigestBytes -> UInt8 in
+            aMessageData.withUnsafeBytes { pMessageBytes -> UInt8 in
+                if let aMessageBytesBaseAddress = pMessageBytes.baseAddress
+                , let aBlindMemoryBaseAddress = pDigestBytes.bindMemory(to: UInt8.self).baseAddress {
+                    let aMessageLength = CC_LONG(aMessageData.count)
+                    CC_MD5(aMessageBytesBaseAddress, aMessageLength, aBlindMemoryBaseAddress)
+                }
+                return 0
+            }
+        }
+        aReturnVal = aDigestData.map { String(format: "%02hhx", $0) }.joined()
+        
+        return aReturnVal
+    }
+    
+    
     public func sha1(string pString: String) -> String {
         var aReturnVal: String
         
@@ -161,25 +182,25 @@ public class ATEncryptionManager {
 
 extension ATEncryptionManager {
     
-    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP") throws -> String {
+    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .hex) throws -> String {
         var aReturnVal :String
         
-        aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, initializationVector: pInitializationVector, operationType: kCCEncrypt)
+        aReturnVal = try self.cryptAes(operationType: kCCEncrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
         
         return aReturnVal
     }
     
     
-    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP") throws -> String {
+    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .hex) throws -> String {
         var aReturnVal :String
         
-        aReturnVal = try self.cryptAes(string: pString, passKey: pPassKey, initializationVector: pInitializationVector, operationType: kCCDecrypt)
+        aReturnVal = try self.cryptAes(operationType: kCCDecrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
         
         return aReturnVal
     }
     
     
-    private func cryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String, operationType pOperationType :Int) throws -> String {
+    private func cryptAes(operationType pOperationType :Int, string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String, encoding pEncoding: Encoding = .hex) throws -> String {
         var aReturnVal :String
         
         if pPassKey.count != 32 {
@@ -193,7 +214,12 @@ extension ATEncryptionManager {
         if pOperationType == kCCEncrypt {
             anInputData = pString.data(using: String.Encoding.utf8)
         } else {
-            anInputData = Data(base64Encoded: pString)
+            switch pEncoding {
+            case .base64:
+                anInputData = Data(base64Encoded: pString)
+            case .hex:
+                anInputData = Data(hexEncoded: pString)
+            }
         }
         
         guard let aData = anInputData else {
@@ -232,7 +258,12 @@ extension ATEncryptionManager {
         }
         
         if pOperationType == kCCEncrypt {
-            aReturnVal = aCryptData.base64EncodedString()
+            switch pEncoding {
+            case .base64:
+                aReturnVal = aCryptData.base64EncodedString()
+            case .hex:
+                aReturnVal = aCryptData.hexEncodedString()
+            }
         } else if let aValue = String(data: aCryptData, encoding: .utf8) {
             aReturnVal = aValue
         } else {
@@ -240,6 +271,16 @@ extension ATEncryptionManager {
         }
         
         return aReturnVal
+    }
+    
+}
+
+
+public extension ATEncryptionManager {
+    
+    enum Encoding {
+        case base64
+        case hex
     }
     
 }
