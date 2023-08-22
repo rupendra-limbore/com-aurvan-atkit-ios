@@ -182,7 +182,7 @@ public class ATEncryptionManager {
 
 extension ATEncryptionManager {
     
-    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .hex) throws -> String {
+    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .base64) throws -> String {
         var aReturnVal :String
         
         aReturnVal = try self.cryptAes(operationType: kCCEncrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
@@ -191,7 +191,7 @@ extension ATEncryptionManager {
     }
     
     
-    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .hex) throws -> String {
+    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .base64) throws -> String {
         var aReturnVal :String
         
         aReturnVal = try self.cryptAes(operationType: kCCDecrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
@@ -200,7 +200,7 @@ extension ATEncryptionManager {
     }
     
     
-    private func cryptAes(operationType pOperationType :Int, string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String, encoding pEncoding: Encoding = .hex) throws -> String {
+    private func cryptAes(operationType pOperationType :Int, string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String, encoding pEncoding: Encoding) throws -> String {
         var aReturnVal :String
         
         if pPassKey.count != 32 {
