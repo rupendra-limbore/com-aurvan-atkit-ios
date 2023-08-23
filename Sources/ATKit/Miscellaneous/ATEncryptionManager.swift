@@ -182,7 +182,7 @@ public class ATEncryptionManager {
 
 extension ATEncryptionManager {
     
-    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .base64) throws -> String {
+    public func encryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String? = nil, encoding pEncoding: Encoding = .base64) throws -> String {
         var aReturnVal :String
         
         aReturnVal = try self.cryptAes(operationType: kCCEncrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
@@ -191,7 +191,7 @@ extension ATEncryptionManager {
     }
     
     
-    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String = "ABCDEFGHIJKLMNOP", encoding pEncoding: Encoding = .base64) throws -> String {
+    public func decryptAes(string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String? = nil, encoding pEncoding: Encoding = .base64) throws -> String {
         var aReturnVal :String
         
         aReturnVal = try self.cryptAes(operationType: kCCDecrypt, string: pString, passKey: pPassKey, initializationVector: pInitializationVector, encoding: pEncoding)
@@ -200,13 +200,13 @@ extension ATEncryptionManager {
     }
     
     
-    private func cryptAes(operationType pOperationType :Int, string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String, encoding pEncoding: Encoding) throws -> String {
+    private func cryptAes(operationType pOperationType :Int, string pString: String, passKey pPassKey :String, initializationVector pInitializationVector :String?, encoding pEncoding: Encoding) throws -> String {
         var aReturnVal :String
         
         if pPassKey.count != 32 {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : "For AES-256 the pass-key must of 32 character length."])
         }
-        if pInitializationVector.count != 16 {
+        if let aValue = pInitializationVector, aValue.count != 16 {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : "Initialization vector must of 16 character length."])
         }
         
@@ -225,8 +225,8 @@ extension ATEncryptionManager {
         guard let aData = anInputData else {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : String(format: "Invalid input data.")])
         }
-        let anIvString = pInitializationVector
-        let anIvData: Data = anIvString.data(using: String.Encoding.utf8)!
+        let anInitializationVectorString = pInitializationVector
+        let anInitializationVectorData: Data? = anInitializationVectorString?.data(using: String.Encoding.utf8)!
         
         let aPassKeyString = pPassKey
         let aPassKeyData: Data = aPassKeyString.data(using: String.Encoding.utf8)!
@@ -241,11 +241,22 @@ extension ATEncryptionManager {
 
         var aByteLength = Int(0)
         
-        let aResultStatus = aCryptData.withUnsafeMutableBytes { pCryptBytes in
-            aData.withUnsafeBytes { pDataBytes in
-                anIvData.withUnsafeBytes { pIvBytes in
+        let aResultStatus: CCStatus
+        if let anIvData = anInitializationVectorData {
+            aResultStatus = aCryptData.withUnsafeMutableBytes { pCryptBytes in
+                aData.withUnsafeBytes { pDataBytes in
+                    anIvData.withUnsafeBytes { pIvBytes in
+                        aPassKeyData.withUnsafeBytes { pKeyBytes in
+                        CCCrypt(anOperation, CCAlgorithm(kCCAlgorithmAES), aCryptOptions, pKeyBytes.baseAddress, aPassKeyLength, pIvBytes.baseAddress, pDataBytes.baseAddress, aData.count, pCryptBytes.baseAddress, aCryptLength, &aByteLength)
+                        }
+                    }
+                }
+            }
+        } else {
+            aResultStatus = aCryptData.withUnsafeMutableBytes { pCryptBytes in
+                aData.withUnsafeBytes { pDataBytes in
                     aPassKeyData.withUnsafeBytes { pKeyBytes in
-                    CCCrypt(anOperation, CCAlgorithm(kCCAlgorithmAES), aCryptOptions, pKeyBytes.baseAddress, aPassKeyLength, pIvBytes.baseAddress, pDataBytes.baseAddress, aData.count, pCryptBytes.baseAddress, aCryptLength, &aByteLength)
+                    CCCrypt(anOperation, CCAlgorithm(kCCAlgorithmAES), aCryptOptions, pKeyBytes.baseAddress, aPassKeyLength, nil, pDataBytes.baseAddress, aData.count, pCryptBytes.baseAddress, aCryptLength, &aByteLength)
                     }
                 }
             }
