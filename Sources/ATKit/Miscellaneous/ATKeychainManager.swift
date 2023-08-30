@@ -84,13 +84,14 @@ open class ATKeychainManager: NSObject {
     }
     
     
-    public func remove(valueForKey pKey :String) {
+    public func remove(valueForKey pKey :String, service pService: String? = nil) {
         if UIDevice.current.isSimulator {
             
         } else {
             var aDict :[String:String] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as String
             aDict[kSecAttrAccount as String] = pKey
+            aDict[kSecAttrService as String] = pService
             SecItemDelete(aDict as CFDictionary)
         }
     }
