@@ -20,7 +20,9 @@ open class ATKeychainManager: NSObject {
     public func save(key pKey :String, value pValue :String, service pService: String? = nil) -> Error? {
         var aReturnVal :Error? = nil
         
-        if UIDevice.current.isSimulator == false {
+        if UIDevice.current.isSimulator {
+            aReturnVal = NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : "Keychain is not supported on simulator."])
+        } else {
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
             aDict[kSecAttrAccount as String] = pKey as AnyObject
@@ -57,7 +59,9 @@ open class ATKeychainManager: NSObject {
     public func getValue(forKey pKey :String) -> String? {
         var aReturnVal :String? = nil
         
-        if UIDevice.current.isSimulator == false {
+        if UIDevice.current.isSimulator {
+            aReturnVal = nil
+        } else {
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
             aDict[kSecAttrAccount as String] = pKey as AnyObject
@@ -79,7 +83,9 @@ open class ATKeychainManager: NSObject {
     
     
     public func remove(valueForKey pKey :String) {
-        if UIDevice.current.isSimulator == false {
+        if UIDevice.current.isSimulator {
+            
+        } else {
             var aDict :[String:String] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as String
             aDict[kSecAttrAccount as String] = pKey
