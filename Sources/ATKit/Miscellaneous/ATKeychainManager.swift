@@ -17,7 +17,34 @@ open class ATKeychainManager: NSObject {
     }()
     
     
-    public func save(key pKey :String, value pValue :String, service pService: String? = nil) -> Error? {
+    private func error(osStatus pStatus: OSStatus) -> Error? {
+        var aReturnVal :Error? = nil
+        
+        let aStatus = pStatus
+        if aStatus != Security.errSecSuccess {
+            var anErrorReason :String? = nil
+            if #available(iOS 11.3, *) {
+                if let aValue = SecCopyErrorMessageString(aStatus, nil) {
+                    anErrorReason = aValue as String
+                }
+            }
+            if anErrorReason == nil {
+                if aStatus == Security.errSecReadOnly {
+                    anErrorReason = "Read-only error."
+                } else if aStatus == Security.errSecAuthFailed {
+                    anErrorReason = "Authorization and/or authentication failed."
+                } else if aStatus == Security.errSecNoSuchKeychain {
+                    anErrorReason = "The keychain does not exist."
+                }
+            }
+            let anErrorMessage = String(format: "Can not save data. %@ Code: %d.", anErrorReason ?? "Unknown error.", aStatus)
+            aReturnVal = NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : anErrorMessage])
+        }
+        
+        return aReturnVal
+    }
+    
+    public func saveGenericPassword(service pService: String?, account pAccount :String, password pPassword :String) -> Error? {
         var aReturnVal :Error? = nil
         
         if UIDevice.current.isSimulator {
@@ -26,38 +53,20 @@ open class ATKeychainManager: NSObject {
             // For a keychain item of class kSecClassGenericPassword, the primary key is the combination of kSecAttrAccount and kSecAttrService.
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
-            aDict[kSecAttrAccount as String] = pKey as AnyObject
             aDict[kSecAttrService as String] = pService as AnyObject
-            aDict[kSecValueData as String] = pValue.data(using: String.Encoding.utf8) as AnyObject
+            aDict[kSecAttrAccount as String] = pAccount as AnyObject
+            aDict[kSecValueData as String] = pPassword.data(using: String.Encoding.utf8) as AnyObject
             SecItemDelete(aDict as CFDictionary)
             var aResult : AnyObject?
             let aStatus = SecItemAdd(aDict as CFDictionary, &aResult)
-            if aStatus != Security.errSecSuccess {
-                var anErrorReason :String? = nil
-                if #available(iOS 11.3, *) {
-                    if let aValue = SecCopyErrorMessageString(aStatus, nil) {
-                        anErrorReason = aValue as String
-                    }
-                }
-                if anErrorReason == nil {
-                    if aStatus == Security.errSecReadOnly {
-                        anErrorReason = "Read-only error."
-                    } else if aStatus == Security.errSecAuthFailed {
-                        anErrorReason = "Authorization and/or authentication failed."
-                    } else if aStatus == Security.errSecNoSuchKeychain {
-                        anErrorReason = "The keychain does not exist."
-                    }
-                }
-                let anErrorMessage = String(format: "Can not save data. %@ Code: %d.", anErrorReason ?? "Unknown error.", aStatus)
-                aReturnVal = NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : anErrorMessage])
-            }
+            aReturnVal = self.error(osStatus: aStatus)
         }
         
         return aReturnVal
     }
     
     
-    public func getValue(forKey pKey :String, service pService: String? = nil) -> String? {
+    public func getGenericPassword(service pService: String?, account pAccount :String) -> String? {
         var aReturnVal :String? = nil
         
         if UIDevice.current.isSimulator {
@@ -65,8 +74,8 @@ open class ATKeychainManager: NSObject {
         } else {
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
-            aDict[kSecAttrAccount as String] = pKey as AnyObject
             aDict[kSecAttrService as String] = pService as AnyObject
+            aDict[kSecAttrAccount as String] = pAccount as AnyObject
             aDict[kSecReturnAttributes as String] = true as AnyObject
             aDict[kSecReturnData as String] = true as AnyObject
             var aResult : AnyObject?
@@ -84,14 +93,14 @@ open class ATKeychainManager: NSObject {
     }
     
     
-    public func remove(valueForKey pKey :String, service pService: String? = nil) {
+    public func deleteGenericPassword(service pService: String?, account pAccount :String) {
         if UIDevice.current.isSimulator {
             
         } else {
             var aDict :[String:String] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as String
-            aDict[kSecAttrAccount as String] = pKey
             aDict[kSecAttrService as String] = pService
+            aDict[kSecAttrAccount as String] = pAccount
             SecItemDelete(aDict as CFDictionary)
         }
     }
