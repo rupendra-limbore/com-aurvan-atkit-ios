@@ -23,11 +23,12 @@ open class ATKeychainManager: NSObject {
         if UIDevice.current.isSimulator {
             aReturnVal = NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : "Keychain is not supported on simulator."])
         } else {
+            // For a keychain item of class kSecClassGenericPassword, the primary key is the combination of kSecAttrAccount and kSecAttrService.
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
             aDict[kSecAttrAccount as String] = pKey as AnyObject
-            aDict[kSecValueData as String] = pValue.data(using: String.Encoding.utf8) as AnyObject
             aDict[kSecAttrService as String] = pService as AnyObject
+            aDict[kSecValueData as String] = pValue.data(using: String.Encoding.utf8) as AnyObject
             SecItemDelete(aDict as CFDictionary)
             var aResult : AnyObject?
             let aStatus = SecItemAdd(aDict as CFDictionary, &aResult)
@@ -56,7 +57,7 @@ open class ATKeychainManager: NSObject {
     }
     
     
-    public func getValue(forKey pKey :String) -> String? {
+    public func getValue(forKey pKey :String, service pService: String? = nil) -> String? {
         var aReturnVal :String? = nil
         
         if UIDevice.current.isSimulator {
@@ -65,6 +66,7 @@ open class ATKeychainManager: NSObject {
             var aDict :[String:AnyObject] = [:]
             aDict[kSecClass as String] = kSecClassGenericPassword as AnyObject
             aDict[kSecAttrAccount as String] = pKey as AnyObject
+            aDict[kSecAttrService as String] = pService as AnyObject
             aDict[kSecReturnAttributes as String] = true as AnyObject
             aDict[kSecReturnData as String] = true as AnyObject
             var aResult : AnyObject?
