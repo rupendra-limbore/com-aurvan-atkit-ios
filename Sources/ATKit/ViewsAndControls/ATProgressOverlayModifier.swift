@@ -10,10 +10,10 @@ import SwiftUI
 #endif
 
 @available(iOS 14.0, *)
-struct ATProgressOverlayModifier: ViewModifier {
+public struct ATProgressOverlayModifier: ViewModifier {
     var isTaskInProgress: Bool
     
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         content
             .overlay(
                 Group {
@@ -33,7 +33,7 @@ struct ATProgressOverlayModifier: ViewModifier {
 }
 
 @available(iOS 14.0, *)
-extension View {
+public extension View {
     func progressOverlay(isTaskInProgress pIsTaskInProgress: Bool) -> some View {
         self.modifier(ATProgressOverlayModifier(isTaskInProgress: pIsTaskInProgress))
     }
