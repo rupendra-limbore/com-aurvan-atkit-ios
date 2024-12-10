@@ -6,7 +6,7 @@
 //  Copyright © 2020 Rupendra. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import Security
 
 
@@ -47,7 +47,7 @@ open class ATKeychainManager: NSObject {
     public func saveGenericPassword(service pService: String?, account pAccount :String, password pPassword :String) -> Error? {
         var aReturnVal :Error? = nil
         
-        if UIDevice.current.isSimulator {
+        if ATDeviceManager.currentDevice.isSimulator {
             aReturnVal = NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : "Keychain is not supported on simulator."])
         } else {
             // For a keychain item of class kSecClassGenericPassword, the primary key is the combination of kSecAttrAccount and kSecAttrService.
@@ -69,7 +69,7 @@ open class ATKeychainManager: NSObject {
     public func getGenericPassword(service pService: String?, account pAccount :String) -> String? {
         var aReturnVal :String? = nil
         
-        if UIDevice.current.isSimulator {
+        if ATDeviceManager.currentDevice.isSimulator {
             aReturnVal = nil
         } else {
             var aDict :[String:AnyObject] = [:]
@@ -94,7 +94,7 @@ open class ATKeychainManager: NSObject {
     
     
     public func deleteGenericPassword(service pService: String?, account pAccount :String) {
-        if UIDevice.current.isSimulator {
+        if ATDeviceManager.currentDevice.isSimulator {
             
         } else {
             var aDict :[String:String] = [:]

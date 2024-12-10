@@ -6,6 +6,7 @@
 //  Copyright © 2021 Rupendra. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 
@@ -293,3 +294,5 @@ extension ATSelectOptionController :UITableViewDataSource, UITableViewDelegate {
     }
     
 }
+
+#endif

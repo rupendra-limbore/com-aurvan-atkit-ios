@@ -6,6 +6,7 @@
 //  Copyright © 2018 Aurvan.com. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 
@@ -141,3 +142,5 @@ import UIKit
     }
     
 }
+
+#endif

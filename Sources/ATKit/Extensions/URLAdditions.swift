@@ -6,7 +6,7 @@
 //  Copyright © 2018 Rupendra. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 
 public extension URL {

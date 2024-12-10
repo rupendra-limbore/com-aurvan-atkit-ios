@@ -6,11 +6,14 @@
 //  Copyright © 2020 Rupendra. All rights reserved.
 //
 
+import Foundation
+#if canImport(UIKit)
 import UIKit
-
+#endif
 
 public class ATUtilityManager: NSObject {
     
+    #if canImport(UIKit)
     public static var topWindow: UIWindow? {
         // Take top-most window, as this will hide the keyboard and other windows as well.
         var aReturnVal :UIWindow?
@@ -21,8 +24,9 @@ public class ATUtilityManager: NSObject {
         }
         return aReturnVal
     }
+    #endif
     
-    
+    #if canImport(UIKit)
     public static func topViewController(controller pController: UIViewController? = ATUtilityManager.topWindow?.rootViewController) -> UIViewController? {
         var aReturnVal :UIViewController?
         
@@ -38,5 +42,6 @@ public class ATUtilityManager: NSObject {
         
         return aReturnVal
     }
+    #endif
     
 }

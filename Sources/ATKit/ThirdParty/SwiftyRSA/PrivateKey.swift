@@ -17,6 +17,11 @@ public class PrivateKey: Key {
     /// Note that it does not contain PEM headers and holds data as bytes, not as a base 64 string.
     public let originalData: Data?
     
+    /// RLCHANGES
+    public var secKeyAlgorithm: SecKeyAlgorithm {
+        SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256
+    }
+    
     let tag: String?
     
     /// Returns a PEM representation of the private key.

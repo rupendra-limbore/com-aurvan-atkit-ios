@@ -5,6 +5,7 @@
 //  Copyright © 2020 Rupendra. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 /**
@@ -295,3 +296,5 @@ public class ATProgressOverlay: NSObject {
         self.messageColor = self.defaultMessageColor
     }
 }
+
+#endif

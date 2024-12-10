@@ -5,6 +5,7 @@
 //  Created by Rupendra on 18/06/22.
 //
 
+#if canImport(UIKit)
 import UIKit
 import LocalAuthentication
 
@@ -150,3 +151,5 @@ public class ATLocalAuthenticationManager: NSObject {
         self.passwordAlertController = anAlertController
     }
 }
+
+#endif

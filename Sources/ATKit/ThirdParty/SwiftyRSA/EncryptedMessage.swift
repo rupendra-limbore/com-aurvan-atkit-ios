@@ -27,6 +27,8 @@ public class EncryptedMessage: Message {
     ///   - padding: Padding to use during the decryption
     /// - Returns: Clear message
     /// - Throws: SwiftyRSAError
+    /// RLCHANGES
+    /*
     public func decrypted(with key: PrivateKey, padding: Padding) throws -> ClearMessage {
         let blockSize = SecKeyGetBlockSize(key.reference)
         
@@ -55,5 +57,14 @@ public class EncryptedMessage: Message {
         
         let decryptedData = Data(bytes: decryptedDataBytes, count: decryptedDataBytes.count)
         return ClearMessage(data: decryptedData)
+    }
+    */
+    /// RLCHANGES
+    public func decrypted(with key: PrivateKey, padding: Padding) throws -> ClearMessage {
+        var error: Unmanaged<CFError>?
+        guard let encryptedData = SecKeyCreateDecryptedData(key.reference, key.secKeyAlgorithm, data as CFData, &error) else {
+            throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
+        }
+        return ClearMessage(data: encryptedData as Data)
     }
 }

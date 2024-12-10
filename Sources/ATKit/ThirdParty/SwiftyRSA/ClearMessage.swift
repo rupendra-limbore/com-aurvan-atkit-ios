@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Security
 
 public class ClearMessage: Message {
     
@@ -53,6 +54,8 @@ public class ClearMessage: Message {
     ///   - padding: Padding to use during the encryption
     /// - Returns: Encrypted message
     /// - Throws: SwiftyRSAError
+    /// RLCHANGES
+    /*
     public func encrypted(with key: PublicKey, padding: Padding) throws -> EncryptedMessage {
         
         let blockSize = SecKeyGetBlockSize(key.reference)
@@ -94,6 +97,15 @@ public class ClearMessage: Message {
         let encryptedData = Data(bytes: encryptedDataBytes, count: encryptedDataBytes.count)
         return EncryptedMessage(data: encryptedData)
     }
+     */
+    /// RLCHANGES
+    public func encrypted(with key: PublicKey, padding: Padding) throws -> EncryptedMessage {
+        var error: Unmanaged<CFError>?
+        guard let encryptedData = SecKeyCreateEncryptedData(key.reference, key.secKeyAlgorithm, data as CFData, &error) else {
+            throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
+        }
+        return EncryptedMessage(data: encryptedData as Data)
+    }
     
     /// Signs a clear message using a private key.
     /// The clear message will first be hashed using the specified digest type, then signed
@@ -104,6 +116,8 @@ public class ClearMessage: Message {
     ///   - digestType: Digest
     /// - Returns: Signature of the clear message after signing it with the specified digest type.
     /// - Throws: SwiftyRSAError
+    /// RLCHANGES
+    /*
     public func signed(with key: PrivateKey, digestType: Signature.DigestType) throws -> Signature {
         
         let digest = self.digest(digestType: digestType)
@@ -129,6 +143,15 @@ public class ClearMessage: Message {
         let signatureData = Data(bytes: signatureBytes, count: signatureBytes.count)
         return Signature(data: signatureData)
     }
+     */
+    /// RLCHANGES
+    public func signed(with key: PrivateKey, digestType: Signature.DigestType) throws -> Signature {
+        var error: Unmanaged<CFError>?
+        guard let signatureData = SecKeyCreateSignature(key.reference, SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256, data as CFData, &error) else {
+            throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
+        }
+        return Signature(data: signatureData as Data)
+    }
     
     /// Verifies the signature of a clear message.
     ///
@@ -138,6 +161,8 @@ public class ClearMessage: Message {
     ///   - digestType: Digest type used for the signature
     /// - Returns: Result of the verification
     /// - Throws: SwiftyRSAError
+    /// RLCHANGES
+    /*
     public func verify(with key: PublicKey, signature: Signature, digestType: Signature.DigestType) throws -> Bool {
         
         let digest = self.digest(digestType: digestType)
@@ -156,6 +181,15 @@ public class ClearMessage: Message {
         } else {
             throw SwiftyRSAError.signatureVerifyFailed(status: status)
         }
+    }
+     */
+    /// RLCHANGES
+    public func verify(with key: PublicKey, signature: Signature, digestType: Signature.DigestType) throws -> Bool {
+        var error: Unmanaged<CFError>?
+        guard SecKeyVerifySignature(key.reference, key.secKeyAlgorithm, data as CFData, signature.data as CFData, &error) else {
+            throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
+        }
+        return true
     }
     
     func digest(digestType: Signature.DigestType) -> Data {

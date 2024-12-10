@@ -6,6 +6,7 @@
 //  Copyright © 2018 Rupendra. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
 
 
@@ -99,3 +100,5 @@ public enum UIImageScaleMode: Int {
     case aspectFill
     case resize
 }
+
+#endif

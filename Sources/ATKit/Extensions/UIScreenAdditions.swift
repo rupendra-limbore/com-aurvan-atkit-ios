@@ -6,8 +6,8 @@
 //  Copyright © 2021 Rupendra. All rights reserved.
 //
 
+#if canImport(UIKit)
 import UIKit
-
 
 public extension UIScreen {
     
@@ -52,3 +52,5 @@ public extension UIScreen {
         return aReturnVal
     }
 }
+
+#endif
