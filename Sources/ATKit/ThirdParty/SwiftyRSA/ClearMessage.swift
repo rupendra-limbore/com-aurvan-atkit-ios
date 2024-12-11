@@ -99,9 +99,9 @@ public class ClearMessage: Message {
     }
      */
     /// RLCHANGES
-    public func encrypted(with key: PublicKey, padding: Padding) throws -> EncryptedMessage {
+    public func encrypted(with key: PublicKey, secKeyAlgorithm: SecKeyAlgorithm = SecKeyAlgorithm.rsaEncryptionRaw) throws -> EncryptedMessage {
         var error: Unmanaged<CFError>?
-        guard let encryptedData = SecKeyCreateEncryptedData(key.reference, key.secKeyAlgorithm, data as CFData, &error) else {
+        guard let encryptedData = SecKeyCreateEncryptedData(key.reference, secKeyAlgorithm, data as CFData, &error) else {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
         }
         return EncryptedMessage(data: encryptedData as Data)
@@ -147,7 +147,7 @@ public class ClearMessage: Message {
     /// RLCHANGES
     public func signed(with key: PrivateKey, digestType: Signature.DigestType) throws -> Signature {
         var error: Unmanaged<CFError>?
-        guard let signatureData = SecKeyCreateSignature(key.reference, SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256, data as CFData, &error) else {
+        guard let signatureData = SecKeyCreateSignature(key.reference, SecKeyAlgorithm.rsaSignatureMessagePSSSHA256, data as CFData, &error) else {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
         }
         return Signature(data: signatureData as Data)
@@ -184,9 +184,9 @@ public class ClearMessage: Message {
     }
      */
     /// RLCHANGES
-    public func verify(with key: PublicKey, signature: Signature, digestType: Signature.DigestType) throws -> Bool {
+    public func verify(with key: PublicKey, signature: Signature, digestType: Signature.DigestType, secKeyAlgorithm: SecKeyAlgorithm = SecKeyAlgorithm.rsaSignatureMessagePSSSHA256) throws -> Bool {
         var error: Unmanaged<CFError>?
-        guard SecKeyVerifySignature(key.reference, key.secKeyAlgorithm, data as CFData, signature.data as CFData, &error) else {
+        guard SecKeyVerifySignature(key.reference, secKeyAlgorithm, data as CFData, signature.data as CFData, &error) else {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
         }
         return true

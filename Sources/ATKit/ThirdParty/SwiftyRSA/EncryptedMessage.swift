@@ -60,9 +60,9 @@ public class EncryptedMessage: Message {
     }
     */
     /// RLCHANGES
-    public func decrypted(with key: PrivateKey, padding: Padding) throws -> ClearMessage {
+    public func decrypted(with key: PrivateKey, secKeyAlgorithm: SecKeyAlgorithm = SecKeyAlgorithm.rsaEncryptionRaw) throws -> ClearMessage {
         var error: Unmanaged<CFError>?
-        guard let encryptedData = SecKeyCreateDecryptedData(key.reference, key.secKeyAlgorithm, data as CFData, &error) else {
+        guard let encryptedData = SecKeyCreateDecryptedData(key.reference, secKeyAlgorithm, data as CFData, &error) else {
             throw NSError(domain: "error", code: 1, userInfo: [NSLocalizedDescriptionKey : error.debugDescription])
         }
         return ClearMessage(data: encryptedData as Data)

@@ -19,11 +19,6 @@ public class PublicKey: Key {
     /// or base64 characters.
     public let originalData: Data?
     
-    /// RLCHANGES
-    public var secKeyAlgorithm: SecKeyAlgorithm {
-        SecKeyAlgorithm.rsaSignatureMessagePKCS1v15SHA256
-    }
-    
     let tag: String? // Only used on iOS 8/9
     
     /// Returns a PEM representation of the public key.
